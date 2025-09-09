@@ -1,0 +1,71 @@
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+  <div class="container-fluid align-items-center">
+    <!-- Brand -->
+    <a class="navbar-brand d-flex align-items-center me-3" href="/listings" style="gap:.6rem;">
+      <!-- Bigger Airbnb-like icon -->
+      <i class="fa-brands fa-airbnb" style="font-size:2rem; color:#FF385C;"></i>
+      <!-- Brand text -->
+      <span style="font-size:1.35rem; font-weight:600; color:#222;">NestStay</span>
+    </a>
+
+    <!-- Toggler for small screens -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+      aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <!-- Left: Explore -->
+      <div class="navbar-nav me-3">
+        <a class="nav-link" href="/listings">Explore</a>
+      </div>
+
+      <!-- Center: search pill -->
+      <form class="d-none d-md-flex flex-grow-1 justify-content-center" action="/listings" method="GET" role="search" style="pointer-events:auto;">
+        <div class="input-group" style="max-width:760px; width:60%; border-radius:40px; box-shadow:0 8px 24px rgba(0,0,0,0.08); overflow:hidden;">
+          <input name="where" class="form-control border-0" type="search" placeholder="Where — Search destinations"
+            aria-label="Search destinations" style="min-width:160px; padding:14px 18px;">
+          <button class="btn" type="submit" style="background:#ff385c; color:white; padding:0 18px;">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Right: Airbnb Your Home + auth links -->
+      <div class="navbar-nav ms-auto d-flex align-items-center">
+        <a class="nav-link d-none d-md-block" href="/listings/new">Airbnb Your Home</a>
+
+        <% if (!currUser) { %>
+          <!-- desktop links -->
+          <div class="d-none d-md-flex align-items-center">
+            <a class="nav-link" href="/signup"><b>Sign up</b></a>
+            <a class="nav-link" href="/login"><b>Log in</b></a>
+          </div>
+          <!-- mobile links inside collapse -->
+          <div class="d-md-none w-100 mt-2">
+            <a class="nav-link" href="/listings/new">Airbnb Your Home</a>
+            <a class="nav-link" href="/signup"><b>Sign up</b></a>
+            <a class="nav-link" href="/login"><b>Log in</b></a>
+          </div>
+        <% } else { %>
+          <div class="d-none d-md-flex align-items-center">
+            <a class="nav-link" href="/logout"><b>Log out</b></a>
+          </div>
+          <div class="d-md-none w-100 mt-2">
+            <a class="nav-link" href="/listings/new">Airbnb Your Home</a>
+            <a class="nav-link" href="/logout"><b>Log out</b></a>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Mobile search -->
+      <form class="d-md-none my-2 w-100" action="/listings" method="GET" role="search">
+        <div class="input-group" style="border-radius:12px; overflow:hidden;">
+          <input name="where" class="form-control" type="search" placeholder="Where — Search destinations" aria-label="Search destinations" required>
+          <button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,277 @@
+<% layout("/layout/boilerplate")%>
+
+<!-- Font & Icons (if you already include Font Awesome in layout, remove this line) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+  :root{
+    --muted:#6b7280;
+    --accent:#111827;
+    --pill-border:rgba(0,0,0,0.06);
+    --radius:12px;
+  }
+
+  body { font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+
+  /* --- Category strip (Airbnb-like) --- */
+  .categories-strip {
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    padding:1rem 0.6rem;
+    overflow-x:auto;
+    background:transparent;
+  }
+  .categories-strip::-webkit-scrollbar { height:8px; }
+
+  .categories-scroll {
+    display:flex;
+    gap:1rem;
+    align-items:center;
+    padding-left:0.25rem;
+    flex-wrap: nowrap;
+  }
+
+  .cat {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-width:84px;
+    padding:.45rem .65rem;
+    border-radius:999px;
+    text-align:center;
+    cursor:pointer;
+    color:var(--muted);
+    transition: transform .12s ease, color .12s ease;
+    flex-shrink:0;
+    background: rgba(0,0,0,0.02);
+  }
+  .cat:hover { transform: translateY(-6px); color:var(--accent); }
+  .cat i { font-size:18px; }
+  .cat span { font-size:0.78rem; white-space:nowrap; }
+
+  .cat.active {
+    color:var(--accent);
+    background: rgba(17,24,39,0.04);
+    position:relative;
+  }
+  .cat.active::after{
+    content:"";
+    position:absolute;
+    bottom:-10px;
+    left:20%;
+    right:20%;
+    height:3px;
+    background:var(--accent);
+    border-radius:4px;
+  }
+
+  /* Right side controls */
+  .right-controls {
+    margin-left:auto;
+    display:flex;
+    gap:0.8rem;
+    align-items:center;
+    padding-right:0.5rem;
+  }
+
+  .filters-btn{
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    padding:.55rem .85rem;
+    border-radius:999px;
+    border:1px solid var(--pill-border);
+    background:#fff;
+    font-weight:600;
+    font-size:0.92rem;
+    cursor:pointer;
+  }
+
+  /* Toggle pill wrapper */
+  .tax-pill {
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    padding:.45rem .75rem;
+    border-radius:999px;
+    border:1px solid var(--pill-border);
+    background:#fff;
+    font-size:0.9rem;
+    color:var(--muted);
+  }
+
+  /* checkbox styled as small switch (keeps same id) */
+  .tax-pill input[type="checkbox"]{
+    width:38px;
+    height:22px;
+    appearance:none;
+    -webkit-appearance:none;
+    border-radius:20px;
+    background:#e6e6e6;
+    position:relative;
+    outline:none;
+    cursor:pointer;
+  }
+  .tax-pill input[type="checkbox"]::before{
+    content:"";
+    position:absolute;
+    left:4px;
+    top:3px;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:white;
+    transition: transform .15s ease;
+    box-shadow:0 1px 2px rgba(0,0,0,0.12);
+  }
+  .tax-pill input[type="checkbox"]:checked{
+    background: #4f46e5;
+  }
+  .tax-pill input[type="checkbox"]:checked::before{
+    transform: translateX(16px);
+  }
+
+  .circle-next {
+    display:inline-grid;
+    place-items:center;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:1px solid var(--pill-border);
+    background:#fff;
+    cursor:pointer;
+  }
+
+  /* --- Card styles (kept simple; do not change functionality) --- */
+  .listing-card {
+    border-radius: 12px;
+    overflow:hidden;
+    border:1px solid rgba(0,0,0,0.06);
+    background:#fff;
+    transition: transform .18s ease, box-shadow .18s ease;
+    margin-bottom:1rem;
+  }
+  .listing-card:hover { transform: translateY(-6px); box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06); }
+  .listing-card img { width:100%; height:20rem; object-fit:cover; display:block; }
+
+  .card-body { padding:.85rem; }
+  .card-text b { display:block; margin-bottom:.35rem; font-size:1rem; color:#111827; }
+  .price-row { display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
+  .price { font-weight:600; font-size:0.96rem; }
+  .muted { color:var(--muted); font-size:0.82rem; }
+  .tax-info { display:none; font-size:0.78rem; color:var(--muted); margin-left:6px; }
+
+  @media (max-width:576px){
+    .cat { min-width:72px; }
+    .cat span { font-size:0.72rem; }
+    .listing-card img { height:16rem; }
+  }
+
+  /* Preserve your original filter block ID for backward compatibility */
+  #filters { display:none; } /* hide the old block if present in layout; not used now */
+</style>
+
+<body>
+  <!-- New category/filter strip (Airbnb-like) -->
+  <div class="categories-strip" aria-label="category strip">
+    <div class="categories-scroll" id="categoriesScroll">
+      <!-- Keep links where necessary so project logic remains same -->
+      <div class="cat"><i class="fa-solid fa-tractor"></i><span><a href="/category/Farm" style="color:inherit; text-decoration:none;">Farms</a></span></div>
+      <div class="cat"><i class="fa-solid fa-bed"></i><span>Rooms</span></div>
+      <div class="cat"><i class="fa-solid fa-mountain-sun"></i><span>Amazing views</span></div>
+      <div class="cat"><i class="fa-solid fa-city"></i><span>Iconic cities</span></div>
+      <div class="cat"><i class="fa-solid fa-water"></i><span>Amazing pools</span></div>
+      <div class="cat"><i class="fa-solid fa-umbrella-beach"></i><span>Beach</span></div>
+      <div class="cat"><i class="fa-solid fa-cabin"></i><span>Cabins</span></div>
+      <div class="cat active"><i class="fa-solid fa-satellite"></i><span><a href="/category/OMG" style="color:inherit; text-decoration:none;">OMG!</a></span></div>
+      <div class="cat"><i class="fa-solid fa-water"></i><span>Lakefront</span></div>
+      <!-- Add/remove categories as needed -->
+    </div>
+
+    <div class="right-controls">
+      <button class="filters-btn" id="filtersBtn"><i class="fa-solid fa-sliders"></i> Filters</button>
+
+      <!-- Tax toggle (keeps same id to preserve functionality) -->
+      <label class="tax-pill" title="Display total before taxes">
+        <input id="flexSwitchCheckDefault" class="form-check-input" type="checkbox" role="switch">
+        <div style="font-size:0.88rem; color:var(--muted);">Display total before taxes</div>
+      </label>
+
+      <div class="circle-next" id="scrollNext"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+  </div>
+
+  <!-- --- CARDS BOOTSTRAP --- -->
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3 g-3">
+    <% for(let listing of allListings){ %>
+      <a href="/listings/<%= listing._id %>" class="listing-link col" style="text-decoration:none;">
+        <div class="card listing-card h-100">
+          <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" />
+          <div class="card-img-overlay"></div>
+          <div class="card-body">
+            <p class="card-text">
+               <b><%= listing.title %></b><br/>
+               <% if (listing.price !== null && listing.price !== undefined) { %>
+                 <span class="price">&#8377; <%= listing.price.toLocaleString("en-IN") %></span>
+                 <span class="muted">/ night</span>
+               <% } else { %>
+                 <span class="muted">Price not available</span>
+               <% } %>
+               <i class="tax-info">&nbsp;&nbsp;+18% GST</i>
+            </p>
+            <!-- keep any other card content unchanged -->
+          </div>
+        </div>
+      </a>
+    <% } %>
+  </div>
+
+<script>
+  // Preserve original toggle ID and behavior — toggles visibility of all .tax-info elements
+  (function(){
+    const getswitch = document.getElementById("flexSwitchCheckDefault");
+    const toggleAllTaxInfo = (show) => {
+      document.querySelectorAll(".tax-info").forEach(el => {
+        el.style.display = show ? "inline" : "none";
+      });
+    };
+    // initialize hidden (same default as before)
+    toggleAllTaxInfo(false);
+
+    // keep same event behavior as original (use change)
+    getswitch.addEventListener("change", () => {
+      toggleAllTaxInfo(getswitch.checked);
+    });
+
+    // Scroll-next button behavior for the category strip
+    const scrollNext = document.getElementById("scrollNext");
+    const scrollWrap = document.getElementById("categoriesScroll");
+    if (scrollNext && scrollWrap) {
+      scrollNext.addEventListener("click", () => {
+        scrollWrap.scrollBy({ left: 240, behavior: 'smooth' });
+      });
+    }
+
+    // Filters button - preserve no-op (so your existing filters can be wired later)
+    const filtersBtn = document.getElementById("filtersBtn");
+    if (filtersBtn) {
+      filtersBtn.addEventListener("click", () => {
+        // Do not change existing functionality — hook your modal or filter UI here if needed
+        console.log("Filters clicked");
+      });
+    }
+
+    // Click on categories toggles active class but does not prevent link default behavior
+    document.querySelectorAll('.cat').forEach(cat => {
+      cat.addEventListener('click', () => {
+        document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
+        cat.classList.add('active');
+      });
+    });
+  })();
+</script>
+</body>
